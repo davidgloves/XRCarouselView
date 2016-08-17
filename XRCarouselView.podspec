@@ -1,11 +1,10 @@
 Pod::Spec.new do |s|
 
   s.name         = "XRCarouselView"
-  s.version      = "2.3.1"
-  s.summary      = "The easiest way to use image circulate"
+  s.version      = "2.5.5"
+  s.summary      = "史上最简单的图片轮播，可左右滚动与淡入淡出，秒集成，支持gif图片，自带缓存，不依赖任何第三方库"
 
   s.homepage     = "https://github.com/codingZero/XRCarouselView"
-
   s.license      = "MIT"
 
   s.author       = { "codingZero" => "yd13150@vip.qq.com" }
@@ -16,7 +15,7 @@ Pod::Spec.new do |s|
 
 
   s.source_files  = "XRCarouselView/*.{h,m}"
-  s.resources = "XRCarouselView/placeholder.png"
+  s.resources = "XRCarouselView/XRPlaceholder.png"
   s.requires_arc = true
 
 end

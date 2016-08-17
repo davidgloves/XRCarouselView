@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 #import "XRCarouselView.h"
-@interface ViewController ()
+@interface ViewController ()<XRCarouselViewDelegate>
 @property (nonatomic, strong) XRCarouselView *carouselView;
 @property (weak, nonatomic) IBOutlet XRCarouselView *carouselView1;
 @end
@@ -17,62 +17,88 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    //本地图片
-    NSArray *arr1 = @[[UIImage imageNamed:@"1.jpg"], [UIImage imageNamed:@"2.jpg"], [UIImage imageNamed:@"3.jpg"]];
-    //网络图片
-    NSArray *arr2 = @[@"http://www.5068.com/u/faceimg/20140725173411.jpg", @"http://file27.mafengwo.net/M00/52/F2/wKgB6lO_PTyAKKPBACID2dURuk410.jpeg", @"http://file27.mafengwo.net/M00/B2/12/wKgB6lO0ahWAMhL8AAV1yBFJDJw20.jpeg"];
-    //既有本地图片也有网络图片
-    NSArray *arr3 = @[@"http://www.5068.com/u/faceimg/20140725173411.jpg", [UIImage imageNamed:@"2.jpg"], @"http://file27.mafengwo.net/M00/52/F2/wKgB6lO_PTyAKKPBACID2dURuk410.jpeg", [UIImage imageNamed:@"1.jpg"]];
+    
+    self.title = @"轮播Demo";
+    
+    NSArray *arr = @[
+                     @"http://pic39.nipic.com/20140226/18071023_162553457000_2.jpg",//网络图片
+                     [UIImage imageNamed:@"1.jpg"],//本地图片，传image，不能传名称
+                     @"http://photo.l99.com/source/11/1330351552722_cxn26e.gif",//网络gif图片
+                     gifImageNamed(@"2.gif")//本地gif使用gifImageNamed(name)函数创建
+                     ];
+    
+    NSArray *describeArray = @[@"网络图片", @"本地图片", @"网络动态图", @"本地动态图"];
+    
+    /**
+     *  通过代码创建
+     */
+    self.carouselView = [[XRCarouselView alloc] initWithFrame:CGRectMake(0, 100, [UIScreen mainScreen].bounds.size.width, 180)];
     
     
-    //创建方式1
-//    self.carouselView = [[XRCarouselView alloc] initWithFrame:CGRectMake(0, 100, 375, 180)];
-//    self.carouselView.imageArray = arr3;
+    //设置占位图片,须在设置图片数组之前设置,不设置则为默认占位图
+    _carouselView.placeholderImage = [UIImage imageNamed:@"placeholderImage.jpg"];
     
-    //创建方式2
-//    self.carouselView = [[XRCarouselView alloc] initWithImageArray:arr1];
-//    self.carouselView.frame = CGRectMake(0, 100, 375, 180);
+    //设置图片及描述数组
+    _carouselView.imageArray = arr;
+    _carouselView.describeArray = describeArray;
     
-    //创建方式3
-//    self.carouselView = [[XRCarouselView alloc] initWithImageArray:arr2 imageClickBlock:^(NSInteger index) {
-//        NSLog(@"第%ld张图片被点击", index);
-//    }];
-//    self.carouselView.frame = CGRectMake(0, 100, 375, 180);
-//    
-    //创建方式4
-//    self.carouselView = [XRCarouselView carouselViewWithImageArray:arr3];
-//    self.carouselView.frame = CGRectMake(0, 100, 375, 180);
+    //用代理处理图片点击
+    _carouselView.delegate = self;
     
-    NSArray *describeArray = @[@"这是第一张图片的描述", @"这是第二张图片的描述", @"这是第三张图片的描述", @"这是第四张图片的描述"];
-    //创建方式5
-    self.carouselView = [XRCarouselView carouselViewWithImageArray:arr3 describeArray:describeArray];
-    self.carouselView.imageClickBlock = ^(NSInteger index) {
-        NSLog(@"第%ld张图片被点击", index);
-    };
-    self.carouselView.frame = CGRectMake(0, 100, 375, 180);
+    //设置每张图片的停留时间，默认值为5s，最少为2s
+    _carouselView.time = 2;
     
-    //设置每张图片的停留时间
-//    _carouselView.time = 1.5;
-    //设置分页控件的图片
-    [_carouselView setPageImage:[UIImage imageNamed:@"other"] andCurrentImage:[UIImage imageNamed:@"current"]];
-    //设置分页控件的frame
-    CGFloat width = arr3.count * 30;
-    CGFloat height = 20;
-    CGFloat x = _carouselView.frame.size.width - width - 10;
-    CGFloat y = _carouselView.frame.size.height - height - 20;
-    _carouselView.pageControl.frame = CGRectMake(x, y, width, height);
-    //隐藏分页控件
-//    _carouselView.pageControl.hidden = YES;
+    //设置分页控件的图片,不设置则为系统默认
+    [_carouselView setPageImage:[UIImage imageNamed:@"other"] andCurrentPageImage:[UIImage imageNamed:@"current"]];
+    
+    //设置分页控件的位置，默认为PositionBottomCenter
+    _carouselView.pagePosition = PositionBottomRight;
+    
+    /**
+     *  修改图片描述控件的外观，不需要修改的传nil
+     *
+     *  参数一 字体颜色，默认为白色
+     *  参数二 字体，默认为13号字体
+     *  参数三 背景颜色，默认为黑色半透明
+     */
+    UIColor *bgColor = [[UIColor blueColor] colorWithAlphaComponent:0.5];
+    UIFont *font = [UIFont systemFontOfSize:15];
+    UIColor *textColor = [UIColor greenColor];
+    [_carouselView setDescribeTextColor:textColor font:font bgColor:bgColor];
+    
+    
     [self.view addSubview:_carouselView];
     
     
     
-    _carouselView1.imageArray = arr3;
-    _carouselView1.describeLabel.center = CGPointMake(375 / 2, 10);
-    _carouselView1.time = 2;
     
+    
+    /**
+     *  通过storyboard创建的轮播控件
+     */
+    _carouselView1.imageArray = arr;
+    
+    //设置分页控件指示器的颜色
+    [_carouselView1 setPageColor:[UIColor blueColor] andCurrentPageColor:[UIColor redColor]];
+    //设置图片切换的方式
+    _carouselView1.changeMode = ChangeModeFade;
+    //用block处理图片点击事件
+    _carouselView1.imageClickBlock = ^(NSInteger index){
+        NSLog(@"点击了第%ld张图片", index);
+    };
+    _carouselView1.time = 3;
 }
 
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    //清除缓存
+    [XRCarouselView clearDiskCache];
+}
+
+
+#pragma mark XRCarouselViewDelegate
+- (void)carouselView:(XRCarouselView *)carouselView clickImageAtIndex:(NSInteger)index {
+    NSLog(@"点击了第%ld张图片", index);
+}
 
 
 - (IBAction)start:(id)sender {
